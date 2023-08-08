@@ -1,1 +1,1 @@
-Javascript Capstnes
+ javascript capstone
