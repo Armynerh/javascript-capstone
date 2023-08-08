@@ -1,4 +1,5 @@
 import './style.css';
+import food from './images/food.jpeg'
 
 const dishes = [
   { name: 'Dish Name 1', likes: 123 },
@@ -16,7 +17,7 @@ dishes.forEach((dish) => {
   itemDiv.className = 'item';
 
   const img = document.createElement('img');
-  img.src = 'images/food.jpeg';
+  img.src = food;
   img.alt = 'Image not available';
 
   const h2 = document.createElement('h2');
