@@ -42,3 +42,61 @@ dishes.forEach((dish) => {
 
   itemContainer.appendChild(itemDiv);
 });
+
+// JavaScript code for the popup functionality
+
+// Function to show the popup
+function showPopup() {
+  const popup = document.createElement('div');
+  popup.className = 'popup';
+
+  const closeButton = document.createElement('button');
+  closeButton.className = 'close-button';
+  closeButton.innerHTML = '&times;'; // Use 'times' symbol (X) as the button text
+
+  const nameInput = document.createElement('input');
+  nameInput.className = 'name-input';
+  nameInput.placeholder = 'Your Name';
+
+  const commentInput = document.createElement('textarea');
+  commentInput.className = 'comment-input';
+  commentInput.placeholder = 'Type your comment here...';
+
+  const submitButton = document.createElement('button');
+  submitButton.className = 'submit-button';
+  submitButton.textContent = 'Submit';
+
+  const commentDisplay = document.createElement('div');
+  commentDisplay.className = 'comment-display';
+
+  popup.appendChild(closeButton);
+  popup.appendChild(nameInput);
+  popup.appendChild(commentInput);
+  popup.appendChild(submitButton);
+  popup.appendChild(commentDisplay);
+
+  document.body.appendChild(popup);
+
+  // Close the popup when the Close button is clicked
+  closeButton.addEventListener('click', () => {
+    popup.remove();
+  });
+
+  // Submit the comment and display the entered name and comment above the form
+  submitButton.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    const commentText = commentInput.value.trim();
+    if (name !== '' && commentText !== '') {
+      commentDisplay.innerHTML = `<p><strong>${name}:</strong> ${commentText}</p>`;
+      popup.appendChild(commentDisplay);
+    } else {
+      throw new Error('Please enter your name and a valid comment.');
+    }
+  });
+}
+
+// Add event listeners to each "Comments" button
+const commentButtons = document.querySelectorAll('.comment-button');
+commentButtons.forEach((button) => {
+  button.addEventListener('click', showPopup);
+});
