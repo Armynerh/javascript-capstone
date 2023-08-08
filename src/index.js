@@ -42,8 +42,9 @@ dishes.forEach((dish) => {
 
   itemContainer.appendChild(itemDiv);
 });
-
 // JavaScript code for the popup functionality
+
+let commentDisplay; // Declare the commentDisplay variable outside the showPopup function
 
 // Function to show the popup
 function showPopup() {
@@ -66,8 +67,7 @@ function showPopup() {
   submitButton.className = 'submit-button';
   submitButton.textContent = 'Submit';
 
-  const commentDisplay = document.createElement('div');
-  commentDisplay.className = 'comment-display';
+  commentDisplay = document.createElement('div'); // Assign the commentDisplay value here
 
   popup.appendChild(closeButton);
   popup.appendChild(nameInput);
@@ -87,16 +87,41 @@ function showPopup() {
     const name = nameInput.value.trim();
     const commentText = commentInput.value.trim();
     if (name !== '' && commentText !== '') {
-      commentDisplay.innerHTML = `<p><strong>${name}:</strong> ${commentText}</p>`;
-      popup.appendChild(commentDisplay);
+      const comment = {
+        name,
+        text: commentText,
+      };
+      storeComment(comment);
+      displayComments();
     } else {
       throw new Error('Please enter your name and a valid comment.');
     }
   });
 }
 
+// Function to store the comment in local storage
+function storeComment(comment) {
+  const comments = JSON.parse(localStorage.getItem('comments')) || [];
+  comments.push(comment);
+  localStorage.setItem('comments', JSON.stringify(comments));
+}
+
+// Function to display comments from local storage
+function displayComments() {
+  const comments = JSON.parse(localStorage.getItem('comments')) || [];
+  let commentDisplayHTML = '';
+  comments.forEach((comment) => {
+    commentDisplayHTML += `<p><strong>${comment.name}:</strong> ${comment.text}</p>`;
+  });
+  if (commentDisplay) {
+    commentDisplay.innerHTML = commentDisplayHTML;
+  }
+}
 // Add event listeners to each "Comments" button
 const commentButtons = document.querySelectorAll('.comment-button');
 commentButtons.forEach((button) => {
   button.addEventListener('click', showPopup);
 });
+
+// Load comments from local storage when the page loads
+document.addEventListener('DOMContentLoaded', displayComments);
