@@ -39,7 +39,7 @@ nav {
 
 #itemContainer {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Three cards per row */
+  grid-template-columns: repeat(3, 1fr);
   grid-gap: 20px;
 }
 
@@ -99,11 +99,6 @@ footer {
   margin-bottom: 0;
   width: 100%;
 }
-
-
-/* CSS for the popup */
-
-/* CSS for the popup */
 
 .popup {
   position: fixed;
