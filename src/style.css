@@ -37,11 +37,10 @@ nav {
   cursor: pointer;
 }
 
-.item-list {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 20px;
+#itemContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-gap: 20px;
 }
 
 .item {
@@ -88,4 +87,69 @@ nav {
 .comment-button:hover,
 .reservation-button:hover {
   background-color: #c0392b;
+}
+
+footer {
+  display: flex;
+  justify-content: space-evenly;
+  background-color: #333;
+  color: white;
+  padding: 10px 0;
+  text-align: center;
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  max-width: 400px;
+}
+
+.close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: transparent;
+  color: #333;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+
+.name-input {
+  width: 85%;
+  padding: 10px;
+  margin-top: 30px;
+  margin-bottom: 10px;
+}
+
+.comment-input {
+  width: 90%;
+  height: 100px;
+  resize: none;
+  margin-bottom: 10px;
+}
+
+.submit-button {
+  background-color: #e74c3c;
+  color: #fff;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-button:hover {
+  background-color: #c0392b;
+}
+
+.comment-display {
+  margin-top: 10px;
 }
