@@ -1,5 +1,7 @@
 import './style.css';
-import { fetchBaseData, fetchLikes, updateInteraction, createApp } from './modules/callApi';
+import {
+  fetchBaseData, fetchLikes, updateInteraction, createApp,
+} from './modules/callApi.js';
 
 const itemContainer = document.getElementById('itemContainer');
 const commentsPopup = document.getElementById('commentsPopup');
@@ -15,8 +17,8 @@ async function populateItems() {
 
     appId = await createApp();
 
-    items.forEach((item) => {
-      const itemDiv = createItemDiv(item);
+    items.forEach(async (item) => {
+      const itemDiv = await createItemDiv(item);
       itemContainer.appendChild(itemDiv);
     });
   } catch (error) {
@@ -24,9 +26,13 @@ async function populateItems() {
   }
 }
 
-function createItemDiv(item) {
+async function createItemDiv(item) {
   const itemDiv = document.createElement('div');
   itemDiv.className = 'item';
+
+  const image = document.createElement('img');
+  image.src = item.image;
+  image.alt = item.name;
 
   const h2 = document.createElement('h2');
   h2.textContent = item.name;
@@ -60,8 +66,9 @@ function createItemDiv(item) {
     showCommentsPopup(item);
   });
 
-  h2.appendChild(likeIcon);
+  itemDiv.appendChild(image);
   itemDiv.appendChild(h2);
+  h2.appendChild(likeIcon);
   itemDiv.appendChild(likes);
   itemDiv.appendChild(commentButton);
 
@@ -74,13 +81,13 @@ async function showCommentsPopup(item) {
     itemComments.textContent = `Comments for ${item.name}`;
 
     // Fetch comments from local storage
-    const comments = fetchCommentsFromLocalStorage(item.id);
+    const comments = await fetchCommentsFromLocalStorage(item.id);
 
     // Update the comments popup content
     updateCommentsList(comments);
 
     // Handle comment submission
-    commentsForm.addEventListener('submit', (event) => {
+    commentsForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       const nameInput = commentsForm.querySelector('.name-input');
       const commentInput = commentsForm.querySelector('.comment-input');
@@ -91,7 +98,7 @@ async function showCommentsPopup(item) {
       if (name && commentText) {
         try {
           // Record comment in local storage
-          const newComment = recordCommentInLocalStorage(item.id, name, commentText);
+          const newComment = await recordCommentInLocalStorage(item.id, name, commentText);
 
           // Update comments list
           comments.push(newComment);
@@ -116,26 +123,25 @@ async function showCommentsPopup(item) {
   }
 }
 
-// Additional helper functions
-
-function fetchCommentsFromLocalStorage(itemId) {
+async function fetchCommentsFromLocalStorage(itemId) {
   const commentsKey = `comments_${itemId}`;
-  return JSON.parse(localStorage.getItem(commentsKey)) || [];
+  const comments = await localStorage.getItem(commentsKey);
+  return JSON.parse(comments) || [];
 }
 
-function recordCommentInLocalStorage(itemId, name, commentText) {
+async function recordCommentInLocalStorage(itemId, name, commentText) {
   const commentsKey = `comments_${itemId}`;
-  const existingComments = JSON.parse(localStorage.getItem(commentsKey)) || [];
+  const existingComments = await fetchCommentsFromLocalStorage(itemId);
   const newComment = { name, text: commentText };
   existingComments.push(newComment);
-  localStorage.setItem(commentsKey, JSON.stringify(existingComments));
+  await localStorage.setItem(commentsKey, JSON.stringify(existingComments));
   return newComment;
 }
 
-function updateCommentsList(comments) {
-  commentsList.innerHTML = ''; // Clear previous comments
+async function updateCommentsList(comments) {
+  commentsList.innerHTML = '';
 
-  comments.forEach(comment => {
+  comments.forEach((comment) => {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.innerHTML = `
