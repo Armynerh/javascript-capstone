@@ -35,22 +35,19 @@ export async function createApp() {
 
 export async function fetchLikes(appId) {
   try {
-    console.log(appId); // Debug: check if appId is correct
     const response = await fetch(`${INVOLVEMENT_API}${appId}/likes/`);
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch likes.');
     }
 
     const likesData = await response.json();
-    console.log(likesData); // Debug: check the received likesData
     return likesData;
   } catch (error) {
     console.error('Error fetching likes:', error);
     throw error;
   }
 }
-
 
 export async function updateInteraction(appId, itemId) {
   try {
