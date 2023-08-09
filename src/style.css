@@ -111,11 +111,11 @@ footer {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   max-width: 400px;
-  display: none; /* Initially hidden */
+  display: none;
 }
 
 .popup.visible {
-  display: block; /* Show the popup */
+  display: block;
 }
 
 .close-button {
