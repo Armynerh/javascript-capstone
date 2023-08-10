@@ -80,11 +80,11 @@ export async function submitComment(appId, itemId, username, comment) {
       },
       body: JSON.stringify({ item_id: itemId, username, comment }),
     });
-    console.log(`BIG`)
+    
     if (!response.ok) {
       throw new Error('Failed to submit comment.');
     }
-
+    console.log(`${INVOLVEMENT_API}${appId}/comments/`)
     return response.status === 201;
   } catch (error) {
     console.error('Error submitting comment:', error);
@@ -92,18 +92,19 @@ export async function submitComment(appId, itemId, username, comment) {
   }
 }
 
-export async function fetchComments(appId, itemId) {
+export async  function fetchComments(appId, item_id) {
   try {
-    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments?item_id=${itemId}`);
-    console.log(`${INVOLVEMENT_API}${appId}/comments?item_id=${itemId.itemId}`)
+    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments?item_id=${item_id}`);
+
     if (!response.ok) {
-      throw new Error('Failed to fetch comments.');
+      throw new Error('Failed to fetch likes.');
     }
 
-    const commentsData = await response.json();
-    return commentsData || [];
+    const likesData = await response.json();
+    return likesData;
   } catch (error) {
-    console.error('Error fetching comments:', error);
-    throw error;
+    console.error('Error fetching likes:', error);
+    // throw error;
   }
 }
+

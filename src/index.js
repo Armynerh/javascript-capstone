@@ -37,19 +37,19 @@ async function populateItems() {
     });
 
     await updateLikes();
-    // await fetchAndUpdateComments();
 
   } catch (error) {
     console.error('Error fetching items:', error);
   }
 }
 
-async function fetchAndUpdateComments() {
+async function fetchAndUpdateComments(item) {
+  console.log({ items })
   try {
-    for (const item of items) {
-      const comments = await fetchComments(appId, item.id);
-      updateCommentsList(item.id, comments);
-    }
+    const comments = await fetchComments(appId, item.id);
+    console.log({ comments })
+    
+    updateCommentsList(item.id, comments);
   } catch (error) {
     console.error('Error fetching and updating comments:', error);
   }
@@ -61,11 +61,9 @@ async function updateLikes() {
     const getLikesData = (itemId) => likesData.find((like) => like.item_id === itemId) || { likes: 0 };
     for (const item of items) {
       const likedItem = getLikesData(item.id)
-      console.log({ likedItem })
 
       const likeCount = likedItem.likes;
       const likesCountElement = document.getElementById(`likes-${item.id}`);
-      console.log({ likesCountElement })
       if (likesCountElement) {
         likesCountElement.textContent = `${likeCount} Likes`;
       }
@@ -121,8 +119,9 @@ async function showCommentsPopup(item) {
   try {
     commentsPopup.classList.add('visible');
     itemComments.textContent = `Comments for ${item.name}`;
-    const comments = await fetchComments(appId, item.id);
-    updateCommentsList(item.id, comments);
+    // const comments = await fetchComments(appId, item.id);
+    // updateCommentsList(item.id, comments);
+    fetchAndUpdateComments(item)
 
     commentsForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -131,24 +130,22 @@ async function showCommentsPopup(item) {
       const name = nameInput.value;
       const commentText = commentInput.value;
 
+      console.log({ name, commentText })
       if (name && commentText) {
         try {
           const success = await submitComment(appId, item.id, name, commentText);
-
           if (success) {
-            const newComment = { name, text: commentText };
-            updateCommentsList(item.id, [...comments, newComment]);
+            // const newComment = { name, text: commentText };
+            // updateCommentsList(item.id, [...comments, newComment]);
             nameInput.value = '';
             commentInput.value = '';
+
+            fetchAndUpdateComments(item)
           }
         } catch (error) {
           console.error('Error submitting comment:', error);
         }
       }
-    });
-
-    closeCommentsButton.addEventListener('click', () => {
-      commentsPopup.classList.remove('visible');
     });
 
   } catch (error) {
@@ -157,7 +154,7 @@ async function showCommentsPopup(item) {
 }
 
 function updateCommentsList(itemId, comments) {
-  const itemCommentsElement = document.querySelector(`#commentsList-${itemId}`);
+  const itemCommentsElement = commentsList;
   if (!itemCommentsElement) return;
 
   itemCommentsElement.innerHTML = '';
@@ -166,13 +163,16 @@ function updateCommentsList(itemId, comments) {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.innerHTML = `
-      <strong>${comment.name}:</strong>
-      <p>${comment.text}</p>
+      <p>${comment.username}:  ${comment.comment}</p>
+      
     `;
     itemCommentsElement.appendChild(commentDiv);
   });
 }
 
+closeCommentsButton.addEventListener('click', () => {
+  commentsPopup.classList.remove('visible');
+});
 document.addEventListener('DOMContentLoaded', () => {
   populateItems();
   
