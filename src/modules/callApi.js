@@ -25,7 +25,7 @@ export async function createApp() {
       throw new Error('Failed to create an app.');
     }
 
-    const appId = await response.text();
+    const appId = await response.text('179eWAOBdMdeK9pofG6J');
     return appId;
   } catch (error) {
     console.error('Error creating app:', error);

@@ -1,6 +1,7 @@
 import './style.css';
+// import { sendData, getData } from './modules/apic'
 import {
-  fetchBaseData, fetchLikes, updateInteraction, createApp,
+  fetchBaseData, fetchLikes, updateInteraction, createApp
 } from './modules/callApi.js';
 
 const itemContainer = document.getElementById('itemContainer');
@@ -10,6 +11,38 @@ const commentsList = document.getElementById('commentsList');
 const itemComments = document.getElementById('itemComments');
 
 let appId;
+
+
+
+const url = 'https://us-central1-involvement-api.cloudfunctions.net/capstoneApi/apps/TePAWbpwiBHr7xSY6An3/comments';
+
+export const sendData = async (id, name, message) => {
+  const request = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      item_id: `${id}`,
+      username: `${name}`,
+      comment: `${message}`,
+    }),
+  });
+  return request;
+};
+sendData();
+
+export const getData = async (id) => {
+  const request = await fetch(`${url}?item_id=${id}`);
+  const response = request.json();
+  return response;
+};
+
+export const counter = async (id) => {
+  const Count = await getData(id);
+  return Count.length;
+};
+
+
+
 
 async function populateItems() {
   try {
@@ -31,7 +64,7 @@ async function createItemDiv(item) {
   itemDiv.className = 'item';
 
   const image = document.createElement('img');
-  image.src = item.image;
+  image.src = item.image.medium;
   image.alt = item.name;
 
   const h2 = document.createElement('h2');
@@ -78,10 +111,15 @@ async function createItemDiv(item) {
 async function showCommentsPopup(item) {
   try {
     commentsPopup.classList.add('visible');
-    itemComments.textContent = `Comments for ${item.name}`;
+    itemComments.innerHTML = `
+    <h2> ${item.name}</h2>
+    <p><strong>Duration:</strong> ${item.airtime}<p>
+    <img src="${item.image.medium}" alt="" />
+    <p>Comments</p>
+    `;
 
-    // Fetch comments from local storage
-    const comments = await fetchCommentsFromLocalStorage(item.id);
+    // Fetch comments from the API
+    const comments = await getData(item.id);
 
     // Update the comments popup content
     updateCommentsList(comments);
@@ -97,12 +135,14 @@ async function showCommentsPopup(item) {
 
       if (name && commentText) {
         try {
-          // Record comment in local storage
-          const newComment = await recordCommentInLocalStorage(item.id, name, commentText);
+          // Send comment to the API
+          await sendData(item.id, name, commentText);
+
+          // Fetch updated comments from the API
+          const updatedComments = await getData(item.id);
 
           // Update comments list
-          comments.push(newComment);
-          updateCommentsList(comments);
+          updateCommentsList(updatedComments);
 
           // Reset form inputs
           nameInput.value = '';
@@ -123,21 +163,6 @@ async function showCommentsPopup(item) {
   }
 }
 
-async function fetchCommentsFromLocalStorage(itemId) {
-  const commentsKey = `comments_${itemId}`;
-  const comments = await localStorage.getItem(commentsKey);
-  return JSON.parse(comments) || [];
-}
-
-async function recordCommentInLocalStorage(itemId, name, commentText) {
-  const commentsKey = `comments_${itemId}`;
-  const existingComments = await fetchCommentsFromLocalStorage(itemId);
-  const newComment = { name, text: commentText };
-  existingComments.push(newComment);
-  await localStorage.setItem(commentsKey, JSON.stringify(existingComments));
-  return newComment;
-}
-
 async function updateCommentsList(comments) {
   commentsList.innerHTML = '';
 
@@ -145,8 +170,8 @@ async function updateCommentsList(comments) {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.innerHTML = `
-      <strong>${comment.name}:</strong>
-      <p>${comment.text}</p>
+      <strong>${comment.username}:</strong>
+      <p>${comment.comment}</p>
     `;
     commentsList.appendChild(commentDiv);
   });
