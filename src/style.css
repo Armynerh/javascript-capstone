@@ -111,6 +111,10 @@ footer {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   max-width: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 700px;
+  max-height: 250px;
   display: none;
 }
 

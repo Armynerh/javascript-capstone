@@ -11,7 +11,7 @@
     <nav>
         <div class="logo">MY ShOW</div>
         <ul class="nav-menu">
-            <li class="menu-item">Episodes</li>
+            <li class="menu-item">Episodes <span id="itemCount" class="counter"></span></li>
             <li class="menu-item">Other Shows</li>
             <li class="menu-item">Contact us</li>
         </ul>
@@ -22,16 +22,23 @@
     <div id="commentsPopup" class="popup">
         <button id="closeCommentsButton" class="close-button">×</button>
         <h2 id="itemComments">Comments for Item</h2>
+        <div id="itemImage"></div>
+       
+        <div><h3 id="commentCounter"></h3></div>
         <div class="comment-display" id="commentsList"></div>
+        <div>
+        
         <form id="commentsForm">
+            <h3>Add A comment</h3>
             <input type="text" class="name-input" placeholder="Your Name">
             <textarea class="comment-input" placeholder="Your Comment"></textarea>
             <button type="submit" class="submit-button">Submit</button>
         </form>
     </div>
+    </div>
     <footer>
         <p>&copy; 2023 Created By Imo Danie and Kehinde Henshaw</p>
     </footer>
-
+    
 </body>
 </html>

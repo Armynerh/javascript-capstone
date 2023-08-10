@@ -72,19 +72,19 @@ export async function updateInteraction(appId, itemId) {
 
 export async function submitComment(appId, itemId, username, comment) {
   try {
-    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments/`, 
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ item_id: itemId, username, comment }),
-    });
-    
+    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments/`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ item_id: itemId, username, comment }),
+      });
+
     if (!response.ok) {
       throw new Error('Failed to submit comment.');
     }
-    console.log(`${INVOLVEMENT_API}${appId}/comments/`)
+    console.log(`${INVOLVEMENT_API}${appId}/comments/`);
     return response.status === 201;
   } catch (error) {
     console.error('Error submitting comment:', error);
@@ -92,9 +92,9 @@ export async function submitComment(appId, itemId, username, comment) {
   }
 }
 
-export async  function fetchComments(appId, item_id) {
+export async function fetchComments(appId, idx) {
   try {
-    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments?item_id=${item_id}`);
+    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments?item_id=${idx}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch likes.');
@@ -104,7 +104,6 @@ export async  function fetchComments(appId, item_id) {
     return likesData;
   } catch (error) {
     console.error('Error fetching likes:', error);
-    // throw error;
+    return error;
   }
 }
-

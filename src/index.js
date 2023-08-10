@@ -13,15 +13,20 @@ const commentsPopup = document.getElementById('commentsPopup');
 const commentsForm = document.getElementById('commentsForm');
 const commentsList = document.getElementById('commentsList');
 const itemComments = document.getElementById('itemComments');
+const itemImg = document.getElementById('itemImage');
+const commentCounterPopup = document.getElementById('commentCounter');
 const closeCommentsButton = document.getElementById('closeCommentsButton');
 
 let appId;
 let items = [];
+function updateItemCount(count) {
+  itemCount.textContent = `(${count})`;
+}
 
 async function populateItems() {
   try {
     items = await fetchBaseData();
-
+    updateItemCount(items.length);
     const existingAppId = localStorage.getItem('appId');
 
     if (existingAppId) {
@@ -37,19 +42,19 @@ async function populateItems() {
     });
 
     await updateLikes();
-
   } catch (error) {
     console.error('Error fetching items:', error);
   }
 }
-
+function updateCommentCounter(count) {
+  commentCounterPopup.textContent = `${count} Comments`;
+}
 async function fetchAndUpdateComments(item) {
-  console.log({ items })
   try {
     const comments = await fetchComments(appId, item.id);
-    console.log({ comments })
-    
+
     updateCommentsList(item.id, comments);
+    updateCommentCounter(comments.length);
   } catch (error) {
     console.error('Error fetching and updating comments:', error);
   }
@@ -58,16 +63,17 @@ async function fetchAndUpdateComments(item) {
 async function updateLikes() {
   try {
     const likesData = await fetchLikes(appId);
-    const getLikesData = (itemId) => likesData.find((like) => like.item_id === itemId) || { likes: 0 };
-    for (const item of items) {
-      const likedItem = getLikesData(item.id)
+    const LikesData = (itemId) => likesData.find((like) => like.item_id === itemId) || { likes: 0 };
+
+    items.forEach((item) => {
+      const likedItem = LikesData(item.id);
 
       const likeCount = likedItem.likes;
       const likesCountElement = document.getElementById(`likes-${item.id}`);
       if (likesCountElement) {
         likesCountElement.textContent = `${likeCount} Likes`;
       }
-    }
+    });
   } catch (error) {
     console.error('Error updating likes:', error);
   }
@@ -94,7 +100,7 @@ async function createItemDiv(item) {
     try {
       const updated = await updateInteraction(appId, item.id);
       if (updated) {
-        await populateItems()
+        await populateItems();
       }
     } catch (error) {
       console.error('Error updating interaction:', error);
@@ -108,7 +114,7 @@ async function createItemDiv(item) {
   itemDiv.appendChild(image);
   itemDiv.appendChild(h2);
   h2.appendChild(likeIcon);
-  likes.id = `likes-${item.id}`
+  likes.id = `likes-${item.id}`;
   itemDiv.appendChild(likes);
   itemDiv.appendChild(commentButton);
 
@@ -119,9 +125,10 @@ async function showCommentsPopup(item) {
   try {
     commentsPopup.classList.add('visible');
     itemComments.textContent = `Comments for ${item.name}`;
-    // const comments = await fetchComments(appId, item.id);
-    // updateCommentsList(item.id, comments);
-    fetchAndUpdateComments(item)
+
+    itemImg.innerHTML = `<img src="${item.image.medium}" />`;
+
+    fetchAndUpdateComments(item);
 
     commentsForm.addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -130,7 +137,7 @@ async function showCommentsPopup(item) {
       const name = nameInput.value;
       const commentText = commentInput.value;
 
-      console.log({ name, commentText })
+      console.log({ name, commentText });
       if (name && commentText) {
         try {
           const success = await submitComment(appId, item.id, name, commentText);
@@ -140,14 +147,13 @@ async function showCommentsPopup(item) {
             nameInput.value = '';
             commentInput.value = '';
 
-            fetchAndUpdateComments(item)
+            fetchAndUpdateComments(item);
           }
         } catch (error) {
           console.error('Error submitting comment:', error);
         }
       }
     });
-
   } catch (error) {
     console.error('Error showing comments popup:', error);
   }
@@ -175,6 +181,4 @@ closeCommentsButton.addEventListener('click', () => {
 });
 document.addEventListener('DOMContentLoaded', () => {
   populateItems();
-  
- 
 });
