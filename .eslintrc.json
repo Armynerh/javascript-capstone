@@ -19,6 +19,7 @@
       "no-console": "off",
       "no-undef": "off",
       "no-use-before-define": "off",
+      "no-console": "off",
       "eol-last": "off",
       "import/extensions": [ 1, {
         "js": "always", "json": "always"
