@@ -72,14 +72,16 @@ export async function updateInteraction(appId, itemId) {
 
 export async function submitComment(appId, itemId, username, comment) {
   try {
-    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments/`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ item_id: itemId, username, comment }),
-      });
+    console.log('Submitting comment for item:', itemId);
+    console.log('Comment data:', { username, comment });
+
+    const response = await fetch(`${INVOLVEMENT_API}${appId}/comments/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ item_id: itemId, username, comment }),
+    });
 
     if (!response.ok) {
       throw new Error('Failed to submit comment.');
