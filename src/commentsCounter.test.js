@@ -1,22 +1,14 @@
 import { updateCommentCounter } from './modules/commentester.js';
+import { screen } from '@testing-library/dom';
+import '@testing-library/jest-dom';
 
 describe('updateCommentCounter', () => {
-  let commentCounterPopup;
-
-  beforeEach(() => {
-    commentCounterPopup = document.createElement('span');
-    commentCounterPopup.id = 'commentCounter';
-    document.body.appendChild(commentCounterPopup);
-  });
-
-  afterEach(() => {
-    document.body.removeChild(commentCounterPopup);
-  });
-
   test('updates the comment counter correctly', () => {
     const count = 5;
+    document.body.innerHTML = ' <div><h3 id="commentCounter"></h3></div>';
     updateCommentCounter(count);
 
-    expect(commentCounterPopup.textContent).toBe(` Comments(${count})`);
+    const commentCounter = screen.getByText(`Comments(${count})`);
+    expect(commentCounter).toBeInTheDocument();
   });
 });

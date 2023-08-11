@@ -1,21 +1,14 @@
 import { updateItemCount } from './modules/itemCounter.js';
+import { screen } from '@testing-library/dom';
+import '@testing-library/jest-dom';
 
 describe('updateItemCount', () => {
-  let itemCount;
-
-  beforeEach(() => {
-    itemCount = document.createElement('span');
-    document.body.appendChild(itemCount);
-  });
-
-  afterEach(() => {
-    document.body.removeChild(itemCount);
-  });
-
   test('updates the item count correctly', () => {
     const count = 10;
+    document.body.innerHTML = '<div id="itemCount"></div>';
     updateItemCount(count);
 
-    expect(itemCount.textContent).toBe(`(${count})`);
+    const itemCount = screen.getByText(`(${count})`);
+    expect(itemCount).toBeInTheDocument();
   });
 });
