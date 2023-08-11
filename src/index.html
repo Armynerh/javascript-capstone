@@ -4,22 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Food App</title>
+    <title>TV App</title>
 </head>
 <body>
     <nav>
-        <div class="logo">FOODIE</div>
+        <div class="logo">MY ShOW</div>
         <ul class="nav-menu">
-            <li class="menu-item">Our dishes</li>
-            <li class="menu-item">Our Chefs</li>
+            <li class="menu-item">Episodes</li>
+            <li class="menu-item">Other Shows</li>
             <li class="menu-item">Contact us</li>
         </ul>
     </nav>
     <section>
         <div id="itemContainer"></div>
     </section>
+    <div id="commentsPopup" class="popup">
+        <button class="close-button">×</button>
+        <h2 id="itemComments">Comments for Item</h2>
+        <div class="comment-display" id="commentsList">
+           
+        </div>
+        <form id="commentsForm">
+            <input type="text" class="name-input" placeholder="Your Name">
+            <textarea class="comment-input" placeholder="Your Comment"></textarea>
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
+    </div>
     <footer>
         <p>&copy; 2023 Created By Imo Danie and Kehinde Henshaw</p>
     </footer>
+   
 </body>
 </html>
