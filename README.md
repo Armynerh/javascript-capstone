@@ -174,8 +174,6 @@ I would like to thank Microverse for the learning Experience
 
 ## 📝 License <a name="license"></a>
 
-This project is [MIT](./MIT.md) licensed.
-
-_NOTE: we recommend using the [MIT license]
+This project is [MIT](./LICENSE) licensed.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
