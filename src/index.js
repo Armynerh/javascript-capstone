@@ -7,6 +7,8 @@ import {
   submitComment,
   fetchComments,
 } from './modules/callApi.js';
+import { updateItemCount } from './modules/itemCounter.js';
+import { updateCommentCounter } from './modules/commentester.js';
 
 const itemContainer = document.getElementById('itemContainer');
 const commentsPopup = document.getElementById('commentsPopup');
@@ -14,14 +16,10 @@ const commentsDiv = document.getElementById('form-content');
 const commentsList = document.getElementById('commentsList');
 const itemComments = document.getElementById('itemComments');
 const itemImg = document.getElementById('itemImage');
-const commentCounterPopup = document.getElementById('commentCounter');
 const closeCommentsButton = document.getElementById('closeCommentsButton');
 
 let appId;
 let items = [];
-export function updateItemCount(count) {
-  itemCount.textContent = `(${count})`;
-}
 
 async function populateItems() {
   try {
@@ -46,9 +44,7 @@ async function populateItems() {
     console.error('Error fetching items:', error);
   }
 }
-export function updateCommentCounter(count) {
-  commentCounterPopup.textContent = ` Comments(${count})`;
-}
+
 async function fetchAndUpdateComments(item) {
   try {
     const comments = await fetchComments(appId, item.id);
@@ -93,7 +89,6 @@ async function getItemById(id) {
 async function handleShowPopup() {
   const id = this['data-id'];
   const item = await getItemById(id);
-  console.log({ item });
   showCommentsPopup(item);
 }
 
@@ -140,7 +135,6 @@ async function createItemDiv(item) {
 async function submitCommentHandler(event) {
   event.preventDefault();
   const { id } = event.target.dataset;
-  console.log({ id });
   const item = await getItemById(Number(id));
   const nameInput = commentsForm.querySelector('.name-input');
   const commentInput = commentsForm.querySelector('.comment-input');

@@ -163,3 +163,10 @@ footer {
 .comment-display {
   margin-top: 10px;
 }
+
+.rate {
+  display: flex;
+  justify-content: space-between;
+  margin: 40px 0;
+  font-weight:700;
+}

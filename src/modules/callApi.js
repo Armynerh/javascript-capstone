@@ -72,9 +72,6 @@ export async function updateInteraction(appId, itemId) {
 
 export async function submitComment(appId, itemId, username, comment) {
   try {
-    console.log('Submitting comment for item:', itemId);
-    console.log('Comment data:', { username, comment });
-
     const response = await fetch(`${INVOLVEMENT_API}${appId}/comments/`, {
       method: 'POST',
       headers: {
@@ -86,7 +83,6 @@ export async function submitComment(appId, itemId, username, comment) {
     if (!response.ok) {
       throw new Error('Failed to submit comment.');
     }
-    console.log(`${INVOLVEMENT_API}${appId}/comments/`);
     return response.status === 201;
   } catch (error) {
     console.error('Error submitting comment:', error);
