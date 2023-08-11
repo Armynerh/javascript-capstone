@@ -16,6 +16,7 @@
       "import/no-mutable-exports": "off",
       "no-param-reassign": "off",
       "no-unused-expressions": "off",
+      "no-console": "off",
       "no-undef": "off",
       "no-use-before-define": "off",
       "eol-last": "off",
