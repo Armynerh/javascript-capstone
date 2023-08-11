@@ -10,7 +10,7 @@ import {
 
 const itemContainer = document.getElementById('itemContainer');
 const commentsPopup = document.getElementById('commentsPopup');
-const commentsForm = document.getElementById('commentsForm');
+const commentsDiv = document.getElementById('form-content');
 const commentsList = document.getElementById('commentsList');
 const itemComments = document.getElementById('itemComments');
 const itemImg = document.getElementById('itemImage');
@@ -19,7 +19,7 @@ const closeCommentsButton = document.getElementById('closeCommentsButton');
 
 let appId;
 let items = [];
-function updateItemCount(count) {
+export function updateItemCount(count) {
   itemCount.textContent = `(${count})`;
 }
 
@@ -46,8 +46,8 @@ async function populateItems() {
     console.error('Error fetching items:', error);
   }
 }
-function updateCommentCounter(count) {
-  commentCounterPopup.textContent = `${count} Comments`;
+export function updateCommentCounter(count) {
+  commentCounterPopup.textContent = ` Comments(${count})`;
 }
 async function fetchAndUpdateComments(item) {
   try {
@@ -79,6 +79,24 @@ async function updateLikes() {
   }
 }
 
+async function getItemById(id) {
+  try {
+    const items = await fetchBaseData();
+    const item = items.find((d) => d.id === id) || {};
+    return item;
+  } catch (error) {
+    console.error('Failed to fetch item');
+    return {};
+  }
+}
+
+async function handleShowPopup() {
+  const id = this['data-id'];
+  const item = await getItemById(id);
+  console.log({ item });
+  showCommentsPopup(item);
+}
+
 async function createItemDiv(item) {
   const itemDiv = document.createElement('div');
   itemDiv.className = 'item';
@@ -95,6 +113,7 @@ async function createItemDiv(item) {
   const commentButton = document.createElement('button');
   commentButton.className = 'comment-button';
   commentButton.textContent = 'Comment';
+  commentButton['data-id'] = item.id;
 
   likeIcon.addEventListener('click', async () => {
     try {
@@ -106,10 +125,7 @@ async function createItemDiv(item) {
       console.error('Error updating interaction:', error);
     }
   });
-
-  commentButton.addEventListener('click', () => {
-    showCommentsPopup(item);
-  });
+  commentButton.addEventListener('click', handleShowPopup);
 
   itemDiv.appendChild(image);
   itemDiv.appendChild(h2);
@@ -121,39 +137,52 @@ async function createItemDiv(item) {
   return itemDiv;
 }
 
-async function showCommentsPopup(item) {
+async function submitCommentHandler(event) {
+  event.preventDefault();
+  const { id } = event.target.dataset;
+  console.log({ id });
+  const item = await getItemById(Number(id));
+  const nameInput = commentsForm.querySelector('.name-input');
+  const commentInput = commentsForm.querySelector('.comment-input');
+  const name = nameInput.value;
+  const commentText = commentInput.value;
+
+  if (name && commentText) {
+    try {
+      const success = await submitComment(appId, item.id, name, commentText);
+      if (success) {
+        nameInput.value = '';
+        commentInput.value = '';
+
+        // Fetch and update comments for the specific item
+        await fetchAndUpdateComments(item); // Add await here
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+    }
+  }
+}
+
+function showCommentsPopup(item) {
   try {
     commentsPopup.classList.add('visible');
     itemComments.textContent = `Comments for ${item.name}`;
 
     itemImg.innerHTML = `<img src="${item.image.medium}" />`;
+    commentsDiv.innerHTML = `<form id="commentsForm" data-id="${item.id}">
+     <input type="text" class="name-input" placeholder="Your Name">
+     <textarea class="comment-input" placeholder="Your Comment"></textarea>
+     <button type="submit" class="submit-button">Submit</button>
+ </form>`;
+    // Reset the comment counter to initial value
+    updateCommentCounter(0);
 
+    // Fetch and update comments for the specific item
     fetchAndUpdateComments(item);
+    const commentsForm = document.getElementById('commentsForm');
 
-    commentsForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const nameInput = commentsForm.querySelector('.name-input');
-      const commentInput = commentsForm.querySelector('.comment-input');
-      const name = nameInput.value;
-      const commentText = commentInput.value;
-
-      console.log({ name, commentText });
-      if (name && commentText) {
-        try {
-          const success = await submitComment(appId, item.id, name, commentText);
-          if (success) {
-            // const newComment = { name, text: commentText };
-            // updateCommentsList(item.id, [...comments, newComment]);
-            nameInput.value = '';
-            commentInput.value = '';
-
-            fetchAndUpdateComments(item);
-          }
-        } catch (error) {
-          console.error('Error submitting comment:', error);
-        }
-      }
-    });
+    // Attach the submit handler to the form
+    commentsForm.addEventListener('submit', submitCommentHandler);
   } catch (error) {
     console.error('Error showing comments popup:', error);
   }
