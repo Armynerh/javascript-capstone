@@ -1,6 +1,11 @@
 import './style.css';
 import {
-  fetchBaseData, fetchLikes, updateInteraction, createApp,
+  fetchBaseData,
+  fetchLikes,
+  updateInteraction,
+  createApp,
+  submitComment,
+  fetchComments,
 } from './modules/callApi.js';
 
 const itemContainer = document.getElementById('itemContainer');
@@ -8,43 +13,85 @@ const commentsPopup = document.getElementById('commentsPopup');
 const commentsForm = document.getElementById('commentsForm');
 const commentsList = document.getElementById('commentsList');
 const itemComments = document.getElementById('itemComments');
+const itemImg = document.getElementById('itemImage');
+const commentCounterPopup = document.getElementById('commentCounter');
+const closeCommentsButton = document.getElementById('closeCommentsButton');
 
 let appId;
+let items = [];
+function updateItemCount(count) {
+  itemCount.textContent = `(${count})`;
+}
 
 async function populateItems() {
   try {
-    const items = await fetchBaseData();
+    items = await fetchBaseData();
+    updateItemCount(items.length);
+    const existingAppId = localStorage.getItem('appId');
 
-    appId = await createApp();
+    if (existingAppId) {
+      appId = existingAppId;
+    } else {
+      appId = await createApp();
+      localStorage.setItem('appId', appId);
+    }
 
     items.forEach(async (item) => {
       const itemDiv = await createItemDiv(item);
       itemContainer.appendChild(itemDiv);
     });
+
+    await updateLikes();
   } catch (error) {
     console.error('Error fetching items:', error);
+  }
+}
+function updateCommentCounter(count) {
+  commentCounterPopup.textContent = ` Comments(${count})`;
+}
+async function fetchAndUpdateComments(item) {
+  try {
+    const comments = await fetchComments(appId, item.id);
+
+    updateCommentsList(item.id, comments);
+    updateCommentCounter(comments.length);
+  } catch (error) {
+    console.error('Error fetching and updating comments:', error);
+  }
+}
+
+async function updateLikes() {
+  try {
+    const likesData = await fetchLikes(appId);
+    const LikesData = (itemId) => likesData.find((like) => like.item_id === itemId) || { likes: 0 };
+
+    items.forEach((item) => {
+      const likedItem = LikesData(item.id);
+
+      const likeCount = likedItem.likes;
+      const likesCountElement = document.getElementById(`likes-${item.id}`);
+      if (likesCountElement) {
+        likesCountElement.textContent = `${likeCount} Likes`;
+      }
+    });
+  } catch (error) {
+    console.error('Error updating likes:', error);
   }
 }
 
 async function createItemDiv(item) {
   const itemDiv = document.createElement('div');
   itemDiv.className = 'item';
-
   const image = document.createElement('img');
-  image.src = item.image;
+  image.src = item.image.medium;
   image.alt = item.name;
-
   const h2 = document.createElement('h2');
   h2.textContent = item.name;
-
   const likes = document.createElement('p');
   likes.className = 'likes';
-  likes.textContent = `${item.likes || 0} Likes`;
-
   const likeIcon = document.createElement('span');
   likeIcon.className = 'like-icon';
   likeIcon.innerHTML = '<i class="far fa-heart"></i>';
-
   const commentButton = document.createElement('button');
   commentButton.className = 'comment-button';
   commentButton.textContent = 'Comment';
@@ -53,9 +100,7 @@ async function createItemDiv(item) {
     try {
       const updated = await updateInteraction(appId, item.id);
       if (updated) {
-        const updatedLikesData = await fetchLikes(appId);
-        const likeCount = updatedLikesData.find((like) => like.item_id === item.id).likes || 0;
-        likes.textContent = `${likeCount} Likes`;
+        await populateItems();
       }
     } catch (error) {
       console.error('Error updating interaction:', error);
@@ -69,6 +114,7 @@ async function createItemDiv(item) {
   itemDiv.appendChild(image);
   itemDiv.appendChild(h2);
   h2.appendChild(likeIcon);
+  likes.id = `likes-${item.id}`;
   itemDiv.appendChild(likes);
   itemDiv.appendChild(commentButton);
 
@@ -80,76 +126,59 @@ async function showCommentsPopup(item) {
     commentsPopup.classList.add('visible');
     itemComments.textContent = `Comments for ${item.name}`;
 
-    // Fetch comments from local storage
-    const comments = await fetchCommentsFromLocalStorage(item.id);
+    itemImg.innerHTML = `<img src="${item.image.medium}" />`;
 
-    // Update the comments popup content
-    updateCommentsList(comments);
+    fetchAndUpdateComments(item);
 
-    // Handle comment submission
     commentsForm.addEventListener('submit', async (event) => {
       event.preventDefault();
       const nameInput = commentsForm.querySelector('.name-input');
       const commentInput = commentsForm.querySelector('.comment-input');
-
       const name = nameInput.value;
       const commentText = commentInput.value;
 
+      console.log({ name, commentText });
       if (name && commentText) {
         try {
-          // Record comment in local storage
-          const newComment = await recordCommentInLocalStorage(item.id, name, commentText);
+          const success = await submitComment(appId, item.id, name, commentText);
+          if (success) {
+            // const newComment = { name, text: commentText };
+            // updateCommentsList(item.id, [...comments, newComment]);
+            nameInput.value = '';
+            commentInput.value = '';
 
-          // Update comments list
-          comments.push(newComment);
-          updateCommentsList(comments);
-
-          // Reset form inputs
-          nameInput.value = '';
-          commentInput.value = '';
+            fetchAndUpdateComments(item);
+          }
         } catch (error) {
           console.error('Error submitting comment:', error);
         }
       }
-    });
-
-    // Close button functionality
-    const closeButton = commentsPopup.querySelector('.close-button');
-    closeButton.addEventListener('click', () => {
-      commentsPopup.classList.remove('visible');
     });
   } catch (error) {
     console.error('Error showing comments popup:', error);
   }
 }
 
-async function fetchCommentsFromLocalStorage(itemId) {
-  const commentsKey = `comments_${itemId}`;
-  const comments = await localStorage.getItem(commentsKey);
-  return JSON.parse(comments) || [];
-}
+function updateCommentsList(itemId, comments) {
+  const itemCommentsElement = commentsList;
+  if (!itemCommentsElement) return;
 
-async function recordCommentInLocalStorage(itemId, name, commentText) {
-  const commentsKey = `comments_${itemId}`;
-  const existingComments = await fetchCommentsFromLocalStorage(itemId);
-  const newComment = { name, text: commentText };
-  existingComments.push(newComment);
-  await localStorage.setItem(commentsKey, JSON.stringify(existingComments));
-  return newComment;
-}
-
-async function updateCommentsList(comments) {
-  commentsList.innerHTML = '';
+  itemCommentsElement.innerHTML = '';
 
   comments.forEach((comment) => {
     const commentDiv = document.createElement('div');
     commentDiv.className = 'comment';
     commentDiv.innerHTML = `
-      <strong>${comment.name}:</strong>
-      <p>${comment.text}</p>
+      <p>${comment.username}:  ${comment.comment}</p>
+      
     `;
-    commentsList.appendChild(commentDiv);
+    itemCommentsElement.appendChild(commentDiv);
   });
 }
 
-document.addEventListener('DOMContentLoaded', populateItems);
+closeCommentsButton.addEventListener('click', () => {
+  commentsPopup.classList.remove('visible');
+});
+document.addEventListener('DOMContentLoaded', () => {
+  populateItems();
+});
