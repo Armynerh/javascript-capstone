@@ -1,5 +1,5 @@
-import { updateCommentCounter } from './modules/commentester.js';
 import { screen } from '@testing-library/dom';
+import { updateCommentCounter } from './modules/commentester.js';
 import '@testing-library/jest-dom';
 
 describe('updateCommentCounter', () => {

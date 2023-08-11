@@ -1,5 +1,5 @@
-import { updateItemCount } from './modules/itemCounter.js';
 import { screen } from '@testing-library/dom';
+import { updateItemCount } from './modules/itemCounter.js';
 import '@testing-library/jest-dom';
 
 describe('updateItemCount', () => {
