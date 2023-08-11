@@ -47,7 +47,7 @@ async function populateItems() {
   }
 }
 function updateCommentCounter(count) {
-  commentCounterPopup.textContent = `${count} Comments`;
+  commentCounterPopup.textContent = ` Comments(${count})`;
 }
 async function fetchAndUpdateComments(item) {
   try {
