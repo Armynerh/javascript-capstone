@@ -59,10 +59,10 @@
 
 <!-- LIVE DEMO -->
 
-## 🚀 Live Demo <p>Not Available Yet- Coming Soon </p>
+## 🚀 Live Demo 
 
 
-- [Live Demo Link]()
+- Not Available Yet coming soon
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
